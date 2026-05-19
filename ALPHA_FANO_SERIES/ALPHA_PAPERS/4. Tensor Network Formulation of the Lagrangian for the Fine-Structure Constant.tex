@@ -1,0 +1,383 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\geometry{a4paper, margin=2.5cm}
+
+\title{Tensor Network Formulation of the Lagrangian for the Fine-Structure Constant}
+\author{Massimiliano Blandino \\ 
+\href{https://orcid.org/0009-0006-3252-4011}{ORCID: 0009-0006-3252-4011}}
+\date{April 2026}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The fine-structure constant $\alpha$ is a free parameter of quantum electrodynamics.
+In previous work we showed that $\alpha^{-1}$ can be represented as the on-shell action
+of a geometric Lagrangian and as the expectation value of a structure operator on a
+Hilbert space of bounded continued fractions. Here we unify these perspectives
+through a tensor network formulation, showing that the oscillating circle of radius
+$R = \pi$ is equivalently described by a circular Matrix Product State (MPS) with
+bond dimension $D = 45$, where the continued fraction quotients play the role of
+virtual bonds.
+
+We prove that the commutator between generators at different angular points is
+identically zero, since $G(\theta) = \mathcal{L}_{\text{geo}}(\theta) I_D + \varepsilon K$
+is a sum of an identity matrix (which commutes with everything) and a matrix $K$
+that commutes with itself. Consequently, the product of local transfer matrices
+collapses exactly into the exponential of the sum, with no Baker-Campbell-Hausdorff
+approximations. The residual $O(1/N^2)$ convergence error is due solely to numerical
+quadrature of the scalar Lagrangian integral, not to non-commutativity effects.
+
+For $\varepsilon = 0$ and $\mathcal{L}_{\text{curv}} = 0$ (pure bare geometry),
+the dominant eigenvalue of the contracted transfer matrix yields
+$\ln(\lambda_{\text{max}}) = 4\pi^3 + \pi^2 + \pi$ with error $10^{-11}$ at $N = 10^6$
+steps, confirming the numerical analysis.
+\end{abstract}
+
+\section{Introduction}
+
+For more than a century, the fine-structure constant $\alpha$ has been a free
+parameter of quantum electrodynamics. Its inverse,
+\[
+\alpha^{-1} = 137.035999177(21),
+\]
+is known with extraordinary precision, yet no theoretical derivation from first
+principles exists.
+
+In previous works \cite{blandino2026a,blandino2026b} we developed three levels of
+description:
+\begin{enumerate}
+    \item A fixed continued fraction representation $[14,1,7,3,1,3]$ that reproduces
+    the CODATA 2022 value to $10^{-14}$.
+    \item A quantum expectation model over a Hilbert space of bounded continued
+    fractions (quotients $q_i \le 45$), with numerical simulation of 1 million
+    collapses at 200-digit precision.
+    \item A geometric field theory with Lagrangian
+    $\mathcal{L}_{\text{geo}} = 4\dot{d}^2 + (1/R)d^2 + (1/4)\sqrt{R^2-d^2}$,
+    whose on-shell action for $R = \pi$ yields $4\pi^3 + \pi^2 + \pi \approx \alpha^{-1}$.
+\end{enumerate}
+
+In this work we unify these perspectives through the formalism of tensor networks,
+specifically Matrix Product States (MPS) \cite{verstraete2004,verstraete2006} and
+Projected Entangled Pair States (PEPS) \cite{verstraete2004peps,cirac2009,schollwock2011}.
+
+\section{The Oscillating Circle as a Circular MPS}
+
+\subsection{Matrix Product States}
+
+A Matrix Product State (MPS) for an $N$-site system is defined as:
+\[
+|\Psi\rangle = \sum_{\{\sigma_i\}} \operatorname{Tr}\left[A^{(1)}(\sigma_1) A^{(2)}(\sigma_2)
+\cdots A^{(N)}(\sigma_N)\right] |\sigma_1,\dots,\sigma_N\rangle,
+\]
+where $A^{(i)}(\sigma_i)$ are $D \times D$ matrices and $D$ is the \textbf{bond dimension}.
+The power of MPS lies in its ability to encode short-range entanglement with a number
+of parameters scaling linearly with $N$ \cite{vidal2003,vidal2004}.
+
+\subsection{Circle Parameterization}
+
+We parameterize the circle of radius $R = \pi$ by the phase angle $\theta \in [0, 2\pi]$.
+We discretize the cycle into $N$ points $\theta_i = i \cdot \Delta\theta$ with
+$\Delta\theta = 2\pi/N$. To each point $\theta_i$ we associate a tensor $T(\theta_i)$
+acting on a virtual space of dimension $D = 45$, where $D$ is the upper bound of the
+continued fraction quotients.
+
+The continuous generator of the system is:
+\[
+G(\theta) = \left( \mathcal{L}_{\text{geo}}(\theta) + \mathcal{L}_{\text{curv}} \right) I_D + \varepsilon K,
+\]
+where:
+\begin{itemize}
+    \item $\mathcal{L}_{\text{geo}}(\theta) = 4\dot{d}^2 + (1/R)d^2 + (1/4)\sqrt{R^2-d^2}$
+    is the pure geometric Lagrangian density (note the factor $1/4$ for the surface term),
+    \item $\mathcal{L}_{\text{curv}} = -\dfrac{1}{48\pi A(\pi)}$ is the background density
+    due to configuration space curvature,
+    \item $I_D$ is the $D \times D$ identity matrix (the background acts equally on all
+    virtual microstates),
+    \item $K$ is the shift matrix representing the quantum continued fraction operator,
+    \item $\varepsilon$ is the entanglement strength (quantum correction).
+\end{itemize}
+
+The local transfer matrix is given by the exact matrix exponential:
+\[
+T(\theta_i) = \exp\left(G(\theta_i) \Delta\theta\right).
+\]
+
+\section{Exact Equivalence Proof}
+
+\subsection{Commutativity Lemma}
+
+\begin{lemma}[Generator Commutativity]
+For any pair of angles $\theta_A, \theta_B \in [0, 2\pi]$, we have:
+\[
+[G(\theta_A), G(\theta_B)] = 0.
+\]
+\end{lemma}
+
+\begin{proof}
+Since $G(\theta) = \mathcal{L}(\theta) I_D + \varepsilon K$, where
+$\mathcal{L}(\theta) = \mathcal{L}_{\text{geo}}(\theta) + \mathcal{L}_{\text{curv}}$,
+we compute the commutator:
+\[
+[G(\theta_A), G(\theta_B)] = [\mathcal{L}(\theta_A) I_D, \mathcal{L}(\theta_B) I_D]
++ [\mathcal{L}(\theta_A) I_D, \varepsilon K]
++ [\varepsilon K, \mathcal{L}(\theta_B) I_D] + [\varepsilon K, \varepsilon K].
+\]
+The identity matrix $I_D$ commutes with every matrix, and $K$ commutes with itself.
+Thus all four terms are identically zero. ∎
+\end{proof}
+
+\subsection{Product Collapse Lemma}
+
+\begin{lemma}[Product Collapse]
+For commuting matrices, the exponential of the sum is exactly the product of the
+exponentials:
+\[
+\prod_{i=1}^{N} \exp\left(G(\theta_i) \Delta\theta\right)
+= \exp\left(\sum_{i=1}^{N} G(\theta_i) \Delta\theta\right).
+\]
+\end{lemma}
+
+\begin{proof}
+By the Baker-Campbell-Hausdorff formula, if $[A,B] = 0$, then $e^A e^B = e^{A+B}$.
+By induction, the product of $N$ exponentials of pairwise commuting operators is
+the exponential of the sum. ∎
+\end{proof}
+
+\subsection{Generator Summation}
+
+\begin{lemma}[Generator Summation]
+Substituting the expression for $G(\theta)$:
+\[
+\sum_{i=1}^{N} G(\theta_i) \Delta\theta = \left(\sum_{i=1}^{N}
+\big(\mathcal{L}_{\text{geo}}(\theta_i) + \mathcal{L}_{\text{curv}}\big) \Delta\theta\right) I_D
++ \varepsilon K \sum_{i=1}^{N} \Delta\theta.
+\]
+Since $\sum_{i=1}^{N} \Delta\theta = 2\pi$, the integration of the curvature term yields
+exactly $2\pi \cdot \left(-\frac{1}{48\pi A(\pi)}\right) = -\frac{1}{24A(\pi)}$. Thus:
+\[
+\sum_{i=1}^{N} G(\theta_i) \Delta\theta = \left(S_N - \frac{1}{24A(\pi)}\right) I_D + 2\pi \varepsilon K,
+\]
+where $S_N = \sum_{i=1}^{N} \mathcal{L}_{\text{geo}}(\theta_i) \Delta\theta$ is the
+approximation of the geometric integral.
+\end{lemma}
+
+\subsection{Effective Action Theorem}
+
+\begin{theorem}[Effective Action]
+The dominant eigenvalue of the contracted transfer matrix is:
+\[
+\lambda_{\max}\left(\prod_{i=1}^{N} T(\theta_i)\right)
+= \exp\left(S_N - \frac{1}{24A(\pi)} + 2\pi \varepsilon \mu\right),
+\]
+where $\mu = \lambda_{\max}(K)$ is the dominant eigenvalue of the quantum operator $K$.
+\end{theorem}
+
+\begin{proof}
+From the previous lemmas:
+\[
+\prod_{i=1}^{N} T(\theta_i) = \exp\left(\left(S_N - \frac{1}{24A(\pi)}\right) I_D + 2\pi \varepsilon K\right).
+\]
+For a matrix of the form $c I_D + M$, the eigenvalues are $c + \lambda_i(M)$. Hence:
+\[
+\lambda_{\max}\left(\exp\left(\left(S_N - \frac{1}{24A(\pi)}\right) I_D + 2\pi \varepsilon K\right)\right)
+= \exp\left(S_N - \frac{1}{24A(\pi)} + 2\pi \varepsilon \cdot \lambda_{\max}(K)\right).
+\]
+∎
+\end{proof}
+
+\subsection{Corollaries}
+
+\begin{corollary}[Pure Geometric Action]
+For $\varepsilon = 0$ (no quantum correction) and $\mathcal{L}_{\text{curv}} = 0$
+(flat configuration space), in the limit $N \to \infty$:
+\[
+\Gamma_{\text{geo}} = \lim_{N\to\infty} \ln\left(\lambda_{\max}\right)
+= \lim_{N\to\infty} S_N = \int_0^{2\pi} \mathcal{L}_{\text{geo}}(\theta) \, d\theta
+= 4\pi^3 + \pi^2 + \pi.
+\]
+\end{corollary}
+
+\begin{corollary}[Complete Effective Action]
+For $\varepsilon \neq 0$:
+\[
+\Gamma_{\text{eff}} = \int_0^{2\pi} \mathcal{L}_{\text{geo}}(\theta) \, d\theta
+- \frac{1}{24A(\pi)} + 2\pi \varepsilon \mu.
+\]
+Setting $\varepsilon = -\dfrac{\langle \hat K^{-1} \rangle}{2\pi A(\pi)^2 \pi^2 \mu}$ yields
+the exact synthesis of the three contributions:
+\[
+\Gamma_{\text{eff}} = 4\pi^3 + \pi^2 + \pi - \frac{1}{24A(\pi)}
+- \frac{1}{A(\pi)^2 \pi^2} \langle \hat K^{-1} \rangle \approx \alpha^{-1}.
+\]
+\end{corollary}
+
+\section{Numerical Results}
+
+We implemented the exact contraction of the circular MPS using the
+\texttt{scipy.linalg.expm} library for matrix exponentiation. The results are summarized
+in Table~\ref{tab:convergence}.
+
+\begin{table}[h]
+\centering
+\caption{Convergence of geometric action with number of steps $N$}
+\label{tab:convergence}
+\begin{tabular}{lcc}
+\toprule
+$N_{\text{steps}}$ & $S_{\text{geo}} = \ln(\lambda_{\max})$ & Error \\
+\midrule
+100     & 137.0352701653 & $1.03\times10^{-3}$ \\
+500     & 137.0362624341 & $4.13\times10^{-5}$ \\
+1000    & 137.0362934404 & $1.03\times10^{-5}$ \\
+2000    & 137.0363011920 & $2.58\times10^{-6}$ \\
+5000    & 137.0363033625 & $4.13\times10^{-7}$ \\
+10000   & 137.0363036725 & $1.03\times10^{-7}$ \\
+1000000 & 137.0363037759 & $1.06\times10^{-11}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The error scales as $O(1/N^2)$, as expected for a function with cusps at
+$\theta = \pi/2, 3\pi/2$ due to the $|\cos\theta|$ term in the Lagrangian. The residual
+convergence error is due solely to numerical quadrature of the scalar integral, not
+to non-commutativity effects.
+
+\section{Connection with Tensor Network Physics}
+
+Our formulation finds a natural interpretation in tensor network language:
+
+\begin{itemize}
+    \item The \textbf{bond dimension} $D = 45$ corresponds to the upper bound of the
+    continued fraction quotients, observed in all CODATA values from 2006 to 2022.
+    \item The \textbf{physical leg} of dimension $d = 1$ indicates that the observable
+    is scalar (the action).
+    \item The \textbf{periodicity} of the circle is reflected in the periodic boundary
+    condition of the MPS.
+    \item The \textbf{exact exponential} $\exp(G \Delta\theta)$ respects the Lie algebra
+    of the system, ensuring numerical stability and convergence.
+\end{itemize}
+
+The fact that pure bare geometry ($\varepsilon = 0$, $\mathcal{L}_{\text{curv}} = 0$)
+exactly reproduces the action $4\pi^3 + \pi^2 + \pi$ suggests that the MPS structure
+captures the essential dynamics of the oscillating circle. Entanglement
+($\varepsilon \neq 0$) corresponds to turning on the quantum correction mediated by
+the operator $\hat K$.
+
+\section{Future Extensions: 2D PEPS}
+
+A natural extension of this work is the construction of a 2D Projected Entangled Pair
+State (PEPS) \cite{verstraete2004peps,cirac2009,schollwock2011}, where:
+
+\begin{itemize}
+    \item Each angular point $\theta$ of the circle becomes a row of a 2D lattice,
+    \item The radial coordinate $r$ (or quotient index) plays the role of the second
+    dimension,
+    \item The observable $\alpha^{-1}$ emerges as the trace of the contracted 2D lattice.
+\end{itemize}
+
+Such a formulation could open the way to:
+\begin{itemize}
+    \item Correlation function calculations between quotients,
+    \item Entanglement simulations across different scales of the continued fraction,
+    \item Possible connections with tensor field theory \cite{rivasseau2012} or loop
+    quantum gravity \cite{rovelli2004}.
+\end{itemize}
+
+\section{Conclusions}
+
+We have proven that the oscillating circle of radius $R = \pi$, described by the
+geometric Lagrangian $\mathcal{L}_{\text{geo}} = 4\dot{d}^2 + (1/R)d^2 + (1/4)\sqrt{R^2-d^2}$,
+can be represented as a \textbf{circular Matrix Product State} with bond dimension
+$D = 45$.
+
+The proof rests on three lemmas:
+\begin{enumerate}
+    \item The commutator between generators at different angular points is identically zero.
+    \item The product of local transfer matrices collapses exactly into the exponential
+    of the sum.
+    \item The dominant eigenvalue of the contracted matrix yields the desired geometric
+    action.
+\end{enumerate}
+
+The residual $O(1/N^2)$ convergence error is due solely to numerical quadrature of the
+scalar Lagrangian integral, not to non-commutativity effects. With $N = 10^6$ steps,
+the error is $1.06\times10^{-11}$, well below experimental precision.
+
+This result unifies the three previous perspectives (continued fraction, quantum
+expectation, Lagrangian) into a single tensor network formalism, suggesting that the
+fine-structure constant may be an example of an \textbf{emergent observable} in a
+tensor field theory.
+
+\section*{Acknowledgments}
+
+The author thanks DeepSeek and Gemini 3 Pro for assistance in writing. All scientific
+content is the original work of the author. Code is available on Zenodo at the concept
+DOI \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606}.
+
+\begin{thebibliography}{99}
+
+\bibitem{blandino2026a}
+Blandino, M. (2026). A representation of the fine-structure constant using $\pi$ and
+a continued fraction of small integers.
+Zenodo, concept DOI: \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606}
+
+\bibitem{blandino2026b}
+Blandino, M. (2026). A Lagrangian for the Fine-Structure Constant.
+Zenodo, DOI: \href{https://doi.org/10.5281/zenodo.19863234}{10.5281/zenodo.19863234}
+
+\bibitem{verstraete2004}
+Verstraete, F., \& Cirac, J. I. (2004). Matrix product states for quantum simulation.
+\textit{Physical Review A}, 70(6), 062324.
+\href{https://arxiv.org/abs/quant-ph/0407066}{arXiv:quant-ph/0407066}
+
+\bibitem{verstraete2004peps}
+Verstraete, F., \& Cirac, J. I. (2004). Renormalization algorithms for Quantum-Many Body
+Systems in two and higher dimensions.
+\href{https://arxiv.org/abs/cond-mat/0407066}{arXiv:cond-mat/0407066}
+
+\bibitem{verstraete2006}
+Verstraete, F., Murg, V., \& Cirac, J. I. (2006). Matrix product states, projected
+entangled pair states, and variational renormalization group methods for quantum spin
+systems. \textit{Advances in Physics}, 57(2), 143-224.
+\href{https://arxiv.org/abs/0907.2796}{arXiv:0907.2796}
+
+\bibitem{cirac2009}
+Cirac, J. I., \& Verstraete, F. (2009). Renormalization and tensor product states in
+spin chains and lattices. \textit{Journal of Physics A: Mathematical and Theoretical},
+42(50), 504004.
+
+\bibitem{schollwock2011}
+Schollwöck, U. (2011). The density-matrix renormalization group in the age of matrix
+product states. \textit{Annals of Physics}, 326(1), 96-192.
+
+\bibitem{vidal2003}
+Vidal, G. (2003). Efficient classical simulation of slightly entangled quantum
+computations. \textit{Physical Review Letters}, 91(14), 147902.
+
+\bibitem{vidal2004}
+Vidal, G. (2004). Entanglement renormalization. \textit{Physical Review Letters},
+93(4), 040502.
+
+\bibitem{rivasseau2012}
+Rivasseau, V. (2012). The tensor track: an update. \textit{Prog. Math. Phys.}, 51, 217-226.
+
+\bibitem{rovelli2004}
+Rovelli, C. (2004). \textit{Quantum Gravity}. Cambridge University Press.
+
+\bibitem{codata2022}
+CODATA Recommended Values of the Fundamental Physical Constants: 2022.
+\url{https://physics.nist.gov/constants}
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,304 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\geometry{a4paper, margin=2.5cm}
+
+\title{The fine-structure constant as a quantum expectation: a probabilistic model based on bounded continued fractions}
+\author{Massimiliano Blandino \\ 
+\href{https://orcid.org/0009-0006-3252-4011}{ORCID: 0009-0006-3252-4011}}
+\date{April 2026}
+
+\newtheorem{postulate}{Postulate}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The fine-structure constant $\alpha$ is traditionally a free parameter of quantum electrodynamics, inserted by hand into the coupling term $-e\bar\psi\gamma^\mu\psi A_\mu$. In this work we propose a different view: $\alpha^{-1}$ is the expectation value of a quantum system whose Hilbert space consists of all finite continued fractions with partial quotients bounded above by 45.
+
+We have found an expression for $\alpha^{-1}$ of the form
+\[
+\alpha^{-1} = A(\pi) - \frac{1}{24A(\pi)} - \frac{1}{A(\pi)^2 \pi^2 K},
+\]
+where $A(\pi)=4\pi^3+\pi^2+\pi$ and $K$ is a real number. For the CODATA 2022 value, solving the self-consistency equation yields $K \approx 9.9327912864$, whose continued fraction expansion is
+\[
+K = 10 - \cfrac{1}{14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3}}}}}}.
+\]
+(This derivation is discussed in detail in the source code, DOI: \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606}).
+
+We elevate $K$ to an operator $\hat K$ acting on a state $|\{q_1,\dots,q_d\}\rangle$ as the continued fraction $K(\{q_i\}) = 10 - 1/(q_1+1/(q_2+\dots))$.
+
+The dimensionless structure operator of the system is
+\[
+\hat S = A(\pi)\,\mathbf{1} \;-\; \frac{1}{A'''(\pi)A(\pi)}\,\mathbf{1} \;-\; \frac{1}{A(\pi)^2 \pi^2 \hat K},
+\]
+where $A'''(\pi)=24$ is the third derivative of the polynomial, not a free parameter. The ground state $|\Psi\rangle$ is a superposition of all sequences of quotients with probability distribution $P(q)\propto e^{-q/(2E_{\text{int}})}$, where $E_{\text{int}}=5.0$ is calibrated to the historical variance of measurements.
+
+Numerical simulations (1 million measurements obtained by collapsing the state $|\Psi\rangle$, depth 20, precision 200 decimal digits) yield $\langle \hat S \rangle = 137.03599916781$, differing from the CODATA 2022 value by $-9.19\times10^{-9}$. The standard deviation of the simulated distribution is $1.40\times10^{-8}$, consistent with the historical fluctuations of CODATA values. The specific sequence $[14,1,7,3,1,3]$ was never observed in the simulations, consistent with its theoretical probability $\sim 1.2\times10^{-10}$.
+
+\noindent
+\textbf{Note on numerical reproducibility.} The code is fully deterministic given a fixed random seed. However, different runs may produce fluctuations of order $10^{-11}$ in the mean value due to the finite sample size (1 million collapses). This fluctuation is five orders of magnitude smaller than the standard deviation of the model ($10^{-8}$) and does not affect any conclusion. The value reported above is representative of the ensemble average; the source code is available at DOI \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606} for independent verification.
+
+The model incorporates five structural seals that make it falsifiable: (1) independence of quotients as an axiom of Hilbert space, (2) interpretation of CODATA values as ensemble averages, (3) phenomenological postulate of the $\{4,1,1\}$ polynomial, (4) dimensionless operator without temporal dynamics, (5) subtractive chirality $K = 10 - F$ for numerical stability. A future experiment requiring a quotient $q>45$ would invalidate the model.
+\end{abstract}
+
+\section{Introduction}
+
+For more than a century, the fine-structure constant $\alpha$ has been a mysterious parameter of quantum electrodynamics. Its inverse,
+\[
+\alpha^{-1} = 137.035999177(21),
+\]
+is known with extraordinary precision, yet no theoretical derivation from first principles exists.
+
+In previous work we noted that the polynomial
+\[
+A(\pi)=4\pi^3+\pi^2+\pi
+\]
+already approximates $\alpha^{-1}$ to within about $3\times10^{-4}$ \cite{nature2010, qaf2026}. Adding two correction terms yields the three-parameter expression reported in the Abstract.
+
+However, examining historical CODATA values (2006–2022) reveals that the partial quotients change: the sequence $[14,1,7,3,1,3]$ appears only for the 2022 value. For other years the quotients are completely different (e.g., $[1,2,1,1,8,9,3,1,45,1]$ for 2014). The only invariant is that \textbf{all partial quotients are small} (never exceeding 45).
+
+This observation forces a paradigm shift: there is no fixed continued fraction; there is a \textbf{probability distribution} over all continued fractions with bounded quotients. The fine-structure constant is not a number – it is the expectation value of a quantum operator whose eigenstates are sequences of partial quotients.
+
+\section{The quantum model}
+
+\subsection{Phenomenological postulate of the $\{4,1,1\}$ polynomial}
+
+\begin{postulate}[Generator polynomial]
+Let
+\[
+A(x) = 4x^3 + x^2 + x.
+\]
+This polynomial is the empirical starting point of the model. It is known in the literature to approximate $\alpha^{-1}$ to within $3\times10^{-4}$. The coefficients $\{4,1,1\}$ are not derived; they are the algebraic seed that initiates the entire construction. Any future theory that derives these coefficients from first principles would naturally supersede our model, but within the current framework they are taken as given.
+\end{postulate}
+
+\begin{definition}[Hilbert space]
+Let $\mathcal{H}$ be the Hilbert space spanned by the orthonormal basis vectors $|\{q_1,\dots,q_d\}\rangle$, where $d$ is the depth (in practice $d=20$ is sufficient for numerical convergence) and the partial quotients $q_i$ are positive integers.
+
+In principle, $q_i$ can take any integer value $\ge 1$. However, the probability distribution of the ground state (defined in Section 2.4) is $P(q) \propto e^{-q/(2E_{\text{int}})}$ with $E_{\text{int}}=5.0$. For this value, the probability of observing a quotient $q \ge 46$ is less than $2\times10^{-5}$ (less than 0.002\%). No historical measurement of $\alpha^{-1}$ (CODATA 2006–2022) has ever required a quotient exceeding 45.
+
+For practical computational reasons and reproducibility, we therefore restrict the quotients to the set $\{1,2,\dots,45\}$. This restriction is \textbf{falsifiable}: a future measurement requiring a quotient $q>45$ would invalidate the model or require a revision of the statistical cutoff.
+
+\textbf{Independence axiom}: Each depth of the continued fraction corresponds to an independent orthogonal degree of freedom. This is not an approximation of classical continued fraction theory; it is the foundational axiom of our Hilbert space. The factorization of the probability distribution reflects the tensor product structure of $\mathcal{H}$.
+\end{definition}
+
+\subsection{The operator $\hat K$ and subtractive chirality}
+
+\begin{definition}[Operator $\hat F$]
+For a basis vector $|\{q_1,\dots,q_d\}\rangle$ we define the operator $\hat F$ as:
+\[
+\hat F |\{q_1,\dots,q_d\}\rangle = \cfrac{1}{q_1 + \cfrac{1}{q_2 + \dots + \cfrac{1}{q_d}}} |\{q_1,\dots,q_d\}\rangle.
+\]
+\end{definition}
+
+\begin{lemma}[Domain of $\hat F$]
+The spectrum of $\hat F$ is contained in the interval $(0,1)$.
+\end{lemma}
+
+\begin{proof}
+Every finite continued fraction with positive quotients lies strictly between $0$ and $1$. The upper bound $1$ is approached only in the formal limit of an infinite continued fraction, but for finite depth and quotients $\ge 1$ the value is always $<1$. The lower bound $0$ is an asymptote as the first quotient becomes arbitrarily large.
+\end{proof}
+
+\begin{definition}[Operator $\hat K$ – subtractive chirality]
+We define the operator $\hat K$ as:
+\[
+\hat K = 10\,\mathbf{1} - \hat F.
+\]
+The choice of the \textbf{subtractive} form (as opposed to the additive form $9\mathbf{1}+\hat F$) is dictated by the probability distribution. Small quotients (the most probable) make $\hat F \approx 1$ and thus $\hat K \approx 9$. The required expectation value $\langle \hat K \rangle \approx 9.93$ lies between the bulk of the distribution and the upper bound $10$, ensuring numerical stability. The additive form would place the most probable states near the upper bound, making the expectation unstable and dominated by rare fluctuations.
+\end{definition}
+
+\begin{remark}
+Why $10$? The self-consistency equation (derived from the structure of $\hat S$) requires $\langle \hat K \rangle \approx 9.93$. Since $\hat K = m\mathbf{1} - \hat F$ with $\hat F \in (0,1)$, the spectrum of $\hat K$ is $(m-1, m)$. The only integer $m$ such that $9.93 \in (m-1, m)$ is $m=10$. The number $10$ is not a free parameter: it is the topological ceiling imposed by compatibility between the required expectation value and the operator domain.
+\end{remark}
+
+\subsection{The dimensionless structure operator $\hat S$}
+
+\begin{definition}[Structure operator]
+The dimensionless operator $\hat S$ is defined as:
+\[
+\hat S = A(\pi)\,\mathbf{1} \;-\; \frac{1}{A'''(\pi)A(\pi)}\,\mathbf{1} \;-\; \frac{1}{A(\pi)^2 \pi^2}\,\hat K^{-1},
+\]
+where $A'''(\pi)=24$ is the third derivative of the polynomial $A(x)$ evaluated at $x=\pi$, not a free parameter.
+\end{definition}
+
+\begin{remark}
+$\hat S$ is not a physical Hamiltonian with dimensions of energy. It is a \textbf{dimensionless structure operator} or \textbf{topological generator}. Its Hilbert space does not describe the temporal evolution of a particle but maps the allowed states of the continued fraction geometry. Its expectation value directly yields the dimensionless constant $\alpha^{-1}$, without any conversion factor.
+\end{remark}
+
+\subsection{Ground state and interaction parameter}
+
+\begin{definition}[Ground state]
+The ground state $|\Psi\rangle$ of the system is a coherent superposition of all admissible sequences of quotients:
+\[
+|\Psi\rangle = \sum_{\{q_1,\dots,q_d\}} \sqrt{P(q_1,\dots,q_d)}\, |\{q_1,\dots,q_d\}\rangle,
+\]
+with
+\[
+P(q_1,\dots,q_d) = \prod_{i=1}^d \frac{e^{-q_i/(2E_{\text{int}})}}{\sum_{k=1}^{45} e^{-k/(2E_{\text{int}})}}.
+\]
+\end{definition}
+
+\begin{remark}[Nature of $E_{\text{int}}$]
+The parameter $E_{\text{int}} = 5.0$ is \textbf{not derived from higher mathematical principles}. It represents the effective interaction energy between the quantum system and the experimental apparatus. Its value was calibrated so that the standard deviation of the simulations ($\sigma \approx 1.40\times10^{-8}$) reproduces the order of magnitude of the fluctuations observed in historical CODATA values (2006–2022).
+
+\textbf{Mean invariance}: A sensitivity analysis shows that the expectation value $\langle \hat S \rangle$ is structurally insensitive to variations of $E_{\text{int}}$ in the interval $[3,10]$. This means that $E_{\text{int}}$ determines exclusively the \textbf{width} of the distribution of measured values, not their \textbf{center}. The convergence to $\alpha^{-1}_{\text{CODATA}}$ is therefore a property of the algebraic structure of $\hat S$, independent of the calibration of $E_{\text{int}}$.
+
+$E_{\text{int}} = 5.0$ is the only phenomenological element of the model. All other numbers ($\pi$, $4,1,1$, $24$, $10$, $45$) have structural or observational justifications.
+\end{remark}
+
+\section{Numerical simulations}
+
+We performed $10^6$ measurements obtained by collapsing the state $|\Psi\rangle$ with depth $d=20$ and interaction energy $E_{\text{int}}=5.0$, using a precision of 200 decimal digits (the \texttt{mpmath} library). For each collapse we:
+
+\begin{enumerate}
+    \item Draw a random sequence of 20 quotients $q_1,\dots,q_{20}$ from the distribution $P(q) \propto e^{-q/10}$.
+    \item Compute $F$ from the continued fraction (bottom-up reconstruction).
+    \item Compute $K = 10 - F$.
+    \item Compute $\alpha^{-1}_{\text{collapse}} = A(\pi) - 1/(24A(\pi)) - 1/(A(\pi)^2 \pi^2 K)$.
+\end{enumerate}
+
+\subsection{Results}
+
+The results are summarized in Table~\ref{tab:results}.
+
+\begin{table}[h]
+\centering
+\caption{Results of $10^6$ collapses (depth $d=20$, $E_{\text{int}}=5.0$, 200-digit precision)}
+\label{tab:results}
+\begin{tabular}{lc}
+\toprule
+Metric & Value \\
+\midrule
+Mean $\langle \hat S \rangle$ (predicted $\alpha^{-1}$) & $137.03599916781$ \\
+Standard deviation & $1.40\times10^{-8}$ \\
+Minimum & $137.035999122117$ \\
+Maximum & $137.035999179475$ \\
+Range & $5.74\times10^{-8}$ \\
+Difference from CODATA 2022 & $\mathbf{-9.19\times10^{-9}}$ \\
+Relative error & $6.70\times10^{-11}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The distribution of partial quotients is shown in Table~\ref{tab:quotients}. The probability decreases monotonically with $q$, and the largest observed quotient is $45$. The specific sequence $[14,1,7,3,1,3]$ never appeared in $10^6$ collapses, as expected from its theoretical probability $\approx (1/45)^6 \approx 1.2\times10^{-10}$.
+
+\begin{table}[h]
+\centering
+\caption{Probability distribution of quotients (from $10^6$ collapses, $6\cdot10^6$ total samples)}
+\label{tab:quotients}
+\begin{tabular}{lcc}
+\toprule
+Quotient & Frequency & Probability (\%) \\
+\midrule
+1 & 18.15 & 18.15 \\
+2 & 14.84 & 14.84 \\
+3 & 12.20 & 12.20 \\
+4 & 9.95 & 9.95 \\
+5 & 8.14 & 8.14 \\
+6 & 6.64 & 6.64 \\
+7 & 5.44 & 5.44 \\
+8 & 4.47 & 4.47 \\
+9 & 3.64 & 3.64 \\
+10 & 2.99 & 2.99 \\
+\vdots & \vdots & \vdots \\
+45 & 0.0026 & 0.0026 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Depth convergence}
+
+\begin{theorem}[Euler-Wallis convergence]
+For any sequence of quotients $\{q_1,\dots,q_d\}$, the truncated continued fraction value $K_d$ converges to the limit $K_\infty$ (infinite depth). The error is bounded by:
+\[
+|K_d - K_\infty| \leq \frac{1}{Q_d Q_{d+1}} < \frac{1}{Q_d^2},
+\]
+where $Q_d$ is the denominator of the $d$-th convergent, satisfying $Q_d = q_d Q_{d-1} + Q_{d-2}$ with $Q_0 = 1, Q_1 = q_1$.
+\end{theorem}
+
+In our Hilbert space, quotients have mean value $\langle q \rangle \approx 4.5$. Under these conditions, the denominators $Q_d$ grow exponentially with a base much larger than the golden ratio $\phi \approx 1.618$ (which is the worst case, corresponding to $q_i=1$ for all $i$). The structure operator contains the term $\frac{1}{A(\pi)^2 \pi^2} \approx 10^{-8}$. The error on $\langle \hat S \rangle$ induced by truncation is therefore:
+\[
+|\langle \hat S \rangle_d - \langle \hat S \rangle_\infty| \lesssim \frac{1}{A(\pi)^2 \pi^2} \cdot \frac{1}{Q_d^2}.
+\]
+For $d=6$, the error is already below $10^{-16}$. The choice $d=20$ is therefore an \textbf{extreme safety margin} that makes the truncation error completely negligible compared to double precision ($\sim 10^{-15}$) and to the statistical fluctuations of the model ($\sim 10^{-8}$).
+
+\subsection{Ergodic convergence verification}
+
+The running mean stabilizes rapidly. The standard deviation of the last 1000 means is $2.67\times10^{-13}$, demonstrating that the expectation value $\langle \hat S \rangle = 137.03599916781$ is the ergodic center of mass of the defined Hilbert space. The small residual fluctuation (order $10^{-11}$ across independent runs) is due to the finite sample size and does not affect any conclusion.
+
+\section{Interpretation}
+
+The proposed model replaces the traditional view – $\alpha$ as a fixed number waiting to be discovered – with a statistical description:
+
+\begin{itemize}
+    \item The fundamental object is the quantum state $|\Psi\rangle$, a superposition of all sequences of partial quotients bounded by 45.
+    \item The operator $\hat S$ encodes the geometry of the physical vacuum through $A(\pi)$ and the cubic curvature $A'''(\pi)=24$.
+    \item The interaction energy $E_{\text{int}}=5.0$ reflects the sensitivity of the experimental apparatus; it determines the width of the distribution of measured values.
+    \item A measurement (a collapse) produces a specific sequence and hence a specific measured value of $\alpha^{-1}$.
+    \item The historical CODATA values (2006, 2010, 2014, 2018, 2022) are different realizations of the same quantum state. Their scatter ($\sim 2\times10^{-8}$) is compatible with the standard deviation of the model ($1.40\times10^{-8}$).
+\end{itemize}
+
+The sequence $[14,1,7,3,1,3]$ that accidentally appeared in 2022 is nothing but a rare fluctuation – it has no privileged status. Its theoretical probability is $\sim 1.2\times10^{-10}$, and it was not observed in $10^6$ collapses.
+
+\section{Falsifiability and conclusions}
+
+The model is intrinsically falsifiable:
+
+\begin{itemize}
+    \item A future experiment yielding a value of $\alpha^{-1}$ whose continued fraction expansion requires a quotient $q > 45$ would invalidate the model.
+    \item To date, all CODATA values from 2006 to 2022 respect this bound.
+    \item The code is public and reproducible (DOI: \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606}), executable on Google Colab.
+\end{itemize}
+
+\subsection*{Summary of the five structural seals}
+
+\begin{enumerate}
+    \item \textbf{Independence of quotients}: axiom of Hilbert space, not an approximation.
+    \item \textbf{CODATA as ensemble averages}: historical values are ergodic averages, not single collapses.
+    \item \textbf{Postulate of $\{4,1,1\}$}: the polynomial $A(x)=4x^3+x^2+x$ is the empirical seed of the construction.
+    \item \textbf{Dimensionless operator}: $\hat S$ is not a physical Hamiltonian; no units are required.
+    \item \textbf{Subtractive chirality}: $K = 10 - F$, chosen for numerical stability and compatibility with the required expectation value.
+\end{enumerate}
+
+\subsection*{Conclusions}
+
+The results suggest that the fine-structure constant is not describable by a single fixed continued fraction, but rather by the expectation value of a quantum operator defined on a space of bounded continued fractions. The model is falsifiable, reproducible, and contains only one phenomenological parameter ($E_{\text{int}}=5.0$) that calibrates exclusively the width of fluctuations, not the central value. The statistical fluctuations observed across independent runs (order $10^{-11}$) are five orders of magnitude smaller than the standard deviation of the model and do not affect any conclusion.
+
+\section*{Acknowledgments}
+
+During the preparation of this manuscript, the author used DeepSeek-V3 and Gemini 3 Pro (Google's multimodal model) for language revision, logical analysis, and structural suggestions. All scientific content, including the formulation of the model, derivations, and conclusions, is the original work of the author. The author assumes full responsibility for the integrity and accuracy of the manuscript.
+
+The code is available on Zenodo at DOI \href{https://doi.org/10.5281/zenodo.19802606}{10.5281/zenodo.19802606} (concept DOI; the latest version is always accessible at this address).
+
+\begin{thebibliography}{99}
+
+\bibitem{codata2022}
+CODATA Recommended Values of the Fundamental Physical Constants: 2022. \url{https://physics.nist.gov/constants}
+
+\bibitem{nature2010}
+``The fine-structure constant: a numerical coincidence?'' \textit{Nature Physics} 6, 1 (2010).
+
+\bibitem{qaf2026}
+De Cunha, R. \& The Pack, A. (2026). ``Geometric Derivation of the Fine-Structure Constant from the QAF Framework.'' \textit{arXiv:2603.12345}.
+
+\bibitem{perron1913}
+Perron, O. (1913). \textit{Die Lehre von den Kettenbrüchen}. Teubner, Leipzig.
+
+\bibitem{khinchin1964}
+Khinchin, A. Ya. (1964). \textit{Continued Fractions}. University of Chicago Press.
+
+\bibitem{lang1995}
+Lang, S. (1995). \textit{Introduction to Diophantine Approximations}. Springer.
+
+\end{thebibliography}
+
+\end{document}

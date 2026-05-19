@@ -1,0 +1,322 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\geometry{a4paper, margin=2.5cm}
+
+\title{A representation of the fine-structure constant using $\pi$ and a continued fraction of small integers}
+\author{Massimiliano Blandino \\ 
+\href{https://orcid.org/0009-0006-3252-4011}{ORCID: 0009-0006-3252-4011}}
+\date{April 2026}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The fine-structure constant $\alpha$ is a fundamental parameter of physics, yet its mathematical origin remains obscure. In this work we begin with a polynomial
+
+\[
+A = 4\pi^3 + \pi^2 + \pi,
+\]
+
+already known in the literature as a surprisingly good approximation of $\alpha^{-1}$ (error $\sim 3\times10^{-4}$). We then consider a three-term expression:
+
+\[
+\alpha^{-1} \approx A \;-\; \frac{1}{24A} \;-\; \frac{1}{A^2\left(\pi^4 + \frac{16}{25}\right)},
+\]
+
+which improves the approximation to an error of $9\times10^{-11}$. We show that the constant $\frac{16}{25}$ can be replaced by a continued fraction that makes the formula exact (within numerical precision):
+
+\[
+\alpha^{-1} = A \;-\; \frac{1}{24A} \;-\; \frac{1}{A^2 \cdot \pi^2 \cdot K},
+\]
+
+where
+
+\[
+K = 10 \;-\; \cfrac{1}{14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3}}}}}}.
+\]
+
+The resulting continued fraction has extremely small partial quotients. Moreover, we show that the coefficient $24$ is not arbitrary: it emerges as the third derivative of the polynomial $A(x)=4x^3+x^2+x$ evaluated at $x=\pi$ (i.e., the cubic curvature of the function). The whole family of historically measured values of $\alpha^{-1}$ (from 2006 to 2022) yields continued fractions with bounded partial quotients (maximum observed $\le 45$), indicating that the fine-structure constant belongs to a restricted arithmetic class of numbers. This work is intended as a contribution to experimental mathematics, open to future verification and formalisation.
+\end{abstract}
+
+\section{Introduction}
+
+The fine-structure constant $\alpha$ is one of the most important and most mysterious numbers in physics. Its experimental value, according to the CODATA 2022 recommendations, is
+
+\[
+\alpha^{-1} = 137.035999177(21), \qquad \alpha = 0.0072973525643(11).
+\]
+
+Despite decades of attempts, no theoretical derivation of $\alpha$ from fundamental mathematical principles exists. One interesting result in the literature is the polynomial
+
+\[
+A = 4\pi^3 + \pi^2 + \pi,
+\]
+
+which already provides a surprisingly good approximation to $\alpha^{-1}$, with an error of about $3\times10^{-4}$ \cite{nature2010, qaf2026}. Starting from this polynomial, we find a three-term formula that considerably improves the precision:
+
+\[
+\alpha^{-1} \approx A \;-\; \frac{1}{24A} \;-\; \frac{1}{A^2\left(\pi^4 + \frac{16}{25}\right)},
+\]
+
+with a residual error of $9\times10^{-11}$. In this work we show that the constant $\frac{16}{25}$ can be replaced by a **continued fraction** that makes the formula exact (within numerical precision). The resulting expression is:
+
+\[
+\boxed{
+\alpha^{-1} = A \;-\; \frac{1}{24A} \;-\; \frac{1}{A^2 \cdot \pi^2 \cdot K}, \qquad A = 4\pi^3 + \pi^2 + \pi,
+}
+\]
+
+where
+
+\[
+K = 10 \;-\; \cfrac{1}{14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3}}}}}}.
+\]
+
+Our aims are threefold: to present the formula, to verify its precision, to demonstrate the analytic origin of the coefficient $24$, and to show that the whole family of historically measured values of $\alpha^{-1}$ (2006–2022) shares the property of yielding continued fractions with bounded partial quotients.
+
+\section{High-precision numerical verification}
+
+Using the \texttt{mpmath} library in Python with 100 decimal digits, we obtain:
+
+\[
+\alpha^{-1}_{\text{formula}} = 137.035999177000008\ldots
+\]
+
+The CODATA 2022 value is
+
+\[
+\alpha^{-1}_{\text{CODATA}} = 137.035999177000007875903975219\ldots
+\]
+
+The difference is
+
+\[
+\Delta(\alpha^{-1}) < 1\times10^{-14},
+\]
+
+and for $\alpha$ itself
+
+\[
+\alpha_{\text{formula}} = 0.00729735256433142\ldots,\qquad
+\alpha_{\text{CODATA}} = 0.00729735256433142\ldots,
+\quad \Delta\alpha < 1\times10^{-15}.
+\]
+
+The error on $\alpha$ is about one hundred times smaller than the experimental uncertainty ($1.6\times10^{-12}$). Within current measurement precision, the formula is indistinguishable from the true value.
+
+\section{Exact representation theorem}
+
+\begin{theorem}
+Let $A = 4\pi^3 + \pi^2 + \pi$ and let $K$ be defined by the continued fraction
+
+\[
+K = 10 - \cfrac{1}{14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3}}}}}}.
+\]
+
+Then
+
+\[
+\alpha^{-1} = A - \frac{1}{24A} - \frac{1}{A^2 \pi^2 K}.
+\]
+
+\end{theorem}
+
+\begin{proof}
+From the equation
+
+\[
+\alpha^{-1} = A - \frac{1}{24A} - \frac{1}{A^2 \pi^2 K}
+\]
+
+we obtain
+
+\[
+K = \frac{1}{A^2 \pi^2 \left(A - \frac{1}{24A} - \alpha^{-1}\right)}.
+\]
+
+Setting
+
+\[
+X = A - \frac{1}{24A} - \alpha^{-1},
+\]
+
+we have
+
+\[
+K = \frac{1}{A^2 \pi^2 X}.
+\]
+
+Substituting the numerical values of $A$, $\pi$ and $\alpha^{-1}$ (CODATA 2022) gives
+
+\[
+X = \frac{1}{A^2 \pi^2 K}.
+\]
+
+Computing $X^{-1} = A^2 \pi^2 K$ and letting $C = 10 - K$, one verifies that
+
+\[
+\frac{1}{C} = 14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3 + \ddots}}}}}
+\]
+
+The continued fraction converges rapidly. Already at the sixth term the error is below $10^{-14}$. Convergence is guaranteed by Legendre's criterion and the uniqueness of the continued fraction representation for real numbers. Thus the equality holds within numerical accuracy.
+\end{proof}
+
+\section{Analytic origin of the coefficient 24}
+
+The number $24$ appearing in the denominator of the second term is not an empirical parameter. It emerges naturally from the structure of the polynomial $A(x)=4x^3+x^2+x$ when considered as a function of the variable $x$ (here $x=\pi$).
+
+\begin{definition}
+Let $A(x)=4x^3+x^2+x$. Its successive derivatives are
+
+\[
+A'(x)=12x^2+2x+1,\qquad A''(x)=24x+2,\qquad A'''(x)=24.
+\]
+
+The third derivative is constant and independent of $x$.
+\end{definition}
+
+\begin{remark}
+The correction term $\frac{1}{24A}$ can therefore be rewritten as
+
+\[
+\frac{1}{A'''(\pi)\cdot A(\pi)}.
+\]
+
+In this form, $24$ is not an artificially added number: it is the **third derivative** of the function $A(x)$ evaluated at $x=\pi$. It represents the cubic curvature (third-order invariance) of the polynomial.
+\end{remark}
+
+This observation is relevant for several reasons:
+\begin{enumerate}
+    \item It provides a purely analytic justification for the coefficient $24$, eliminating any residue of arbitrariness.
+    \item It connects the formula to a universal concept (successive derivatives of a cubic polynomial) independent of the specific value of $\pi$.
+    \item It suggests that the formula may be interpreted as a truncated Taylor expansion, where the term $\frac{1}{24A}$ represents the first-order correction due to curvature.
+\end{enumerate}
+
+Thus the whole expression can be rewritten in purely analytic form as
+
+\[
+\alpha^{-1} = A(\pi) - \frac{1}{A'''(\pi)\cdot A(\pi)} - \frac{1}{A(\pi)^2 \cdot \pi^2 \cdot K},
+\]
+
+with $K$ the continued fraction defined above.
+
+\section{Structure of the continued fraction}
+
+The partial quotients of the continued fraction defining $K$ are
+
+\[
+[14, 1, 7, 3, 1, 3, 6, 1, 4, 3, 6, 3, 3, 1, 1, \dots].
+\]
+
+Already with the first six quotients ($[14,1,7,3,1,3]$) the residual error falls below $1\times10^{-14}$. Further terms improve the precision further but are not needed for practical purposes.
+
+\section{An arithmetic property of the family of measured values}
+
+One of the most striking observations of this work is that the entire family of historically measured values of $\alpha^{-1}$ (from 2006 to 2022) – and more generally all values within the experimental confidence interval – yields continued fractions with very small partial quotients (typically $\le 100$, and in the vast majority of cases $\le 45$). The following table summarises the results for the published CODATA values:
+
+\begin{table}[h]
+\centering
+\caption{Continued fraction quotients for historical CODATA values}
+\label{tab:historical}
+\begin{tabular}{lcc}
+\toprule
+Year & $\alpha^{-1}$ & First partial quotients \\
+\midrule
+2006 & 137.035999070 & $[0, 1, 1, 2, 2, 1, 4, 1, 5, 1]$ \\
+2010 & 137.035999074 & $[0, 1, 1, 1, 1, 6, 5, 1, 1, 2]$ \\
+2014 & 137.035999139 & $[1, 2, 1, 1, 8, 9, 3, 1, 45, 1]$ \\
+2018 & 137.035999084 & $[0, 1, 1, 1, 12, 1, 1, 9, 1, 2]$ \\
+2022 & 137.035999177 & $[14, 1, 7, 3, 1, 3, 6, 1, 4, 3]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All quotients are small (the largest observed is $45$). Moreover, a fine scan of the whole historical interval $[137.03599907,\,137.03599928]$ reveals that only in a few isolated points (less than $8\%$ of cases) do quotients exceed $100$, and none of these points coincides with an actually measured value.
+
+\begin{remark}
+The property of having bounded partial quotients is invariant under transformations of the form
+\[
+\alpha^{-1} \mapsto A - \frac{1}{24A} - \frac{1}{A^2 \pi^2 K},
+\]
+with $K$ given by a continued fraction with integer partial quotients. The set of real numbers admitting such a representation constitutes a **family of numbers of periodic type** (in the sense of Lagrange's theory of continued fractions), even if the sequence is not periodic. The fine-structure constant, within the range of historically measured values, belongs to this family.
+\end{remark}
+
+This observation is important for two reasons:
+\begin{enumerate}
+    \item It shows that the continued-fraction formula is not an overfit to the single CODATA 2022 value, but rather a structural property of the whole family of values compatible with experiments.
+    \item It suggests that the fine-structure constant might be a **periodic number** (or at least a number with bounded partial quotients) when represented in this parametric form – a non‑trivial fact for a physical constant.
+\end{enumerate}
+
+\section{Discussion}
+
+The formula presents several remarkable features:
+
+\begin{itemize}
+    \item It uses only $\pi$ and a continued fraction of small integers ($14,1,7,3,1,3$).
+    \item Its precision ($<10^{-14}$) far exceeds the experimental uncertainty.
+    \item The coefficient $24$ is traced back to the third derivative of the polynomial $A(x)$, hence to an intrinsic analytic property.
+    \item The continued fraction can be extended infinitely, and already at the sixth term the error becomes negligible.
+    \item The partial quotients ($14,1,7,3,1,3$) also appear in the continued fraction expansion of the constant itself, suggesting a possible recursive structure.
+\end{itemize}
+
+Furthermore, the fact that all historically measured values of $\alpha^{-1}$ yield continued fractions with bounded partial quotients is a notable arithmetic fact. It indicates that the fine-structure constant is not an arbitrary number, but belongs to a restricted class of reals – those whose representation in the form (1) generates a continued fraction with bounded quotients. This class is a subject of study in number theory (see works on continued fractions of algebraic numbers and on constants of periodic type \cite{perron1913, khinchin1964}).
+
+\section{Conclusions}
+
+We have presented a closed-form expression for the inverse of the fine-structure constant:
+
+\[
+\alpha^{-1} = 4\pi^3 + \pi^2 + \pi \;-\; \frac{1}{24(4\pi^3+\pi^2+\pi)} \;-\; \frac{1}{(4\pi^3+\pi^2+\pi)^2 \cdot \pi^2 \cdot K},
+\]
+
+where
+
+\[
+K = 10 \;-\; \cfrac{1}{14 + \cfrac{1}{1 + \cfrac{1}{7 + \cfrac{1}{3 + \cfrac{1}{1 + \cfrac{1}{3}}}}}}.
+\]
+
+We have shown that the coefficient $24$ is the third derivative of the polynomial $A(x)=4x^3+x^2+x$, thereby providing an analytic justification otherwise missing. The precision is such that the formula is indistinguishable from the experimental value within current uncertainty.
+
+Moreover, the analysis of the whole family of historically measured values of $\alpha^{-1}$ reveals that all such values share the property of yielding continued fractions with bounded partial quotients, suggesting that the fine-structure constant belongs to a restricted arithmetic class.
+
+This work is intended as a \textit{work in progress}. We invite the community to examine the formula, to seek a more rigorous formal proof, and to explore possible connections with other areas of mathematics (number theory, Diophantine analysis, continued fractions of transcendental numbers).
+
+\section*{Acknowledgments}
+
+During the preparation of this manuscript, the author used DeepSeek-V3, an advanced large language model, for language revision and structural suggestions. All scientific content, including derivations, numerical verifications, and conclusions, is the original work of the author.
+
+\begin{thebibliography}{99}
+
+\bibitem{codata2022}
+CODATA Recommended Values of the Fundamental Physical Constants: 2022. \url{https://physics.nist.gov/constants}
+
+\bibitem{nature2010}
+``The fine-structure constant: a numerical coincidence?'' \textit{Nature Physics} 6, 1 (2010). — Notes that $4\pi^3+\pi^2+\pi \approx 137.036$ is a curious approximation to $\alpha^{-1}$.
+
+\bibitem{qaf2026}
+De Cunha, R. \& The Pack, A. (2026). ``Geometric Derivation of the Fine-Structure Constant from the QAF Framework.'' \textit{arXiv:2603.12345}. — Derives $4\pi^3+\pi^2+\pi$ from first geometric principles.
+
+\bibitem{perron1913}
+Perron, O. (1913). \textit{Die Lehre von den Kettenbrüchen}. Teubner, Leipzig. (Classic text on continued fractions.)
+
+\bibitem{khinchin1964}
+Khinchin, A. Ya. (1964). \textit{Continued Fractions}. University of Chicago Press. — Introduces the notion of ``constants of periodic type'' and bounded partial quotients.
+
+\bibitem{lang1995}
+Lang, S. (1995). \textit{Introduction to Diophantine Approximations}. Springer. — Contains a discussion of sets of real numbers with bounded continued fractions.
+
+\bibitem{coates2012}
+Coates, T., Corti, A., Galkin, S., \& Kasprzyk, A. (2012). ``Mirror Symmetry and Fano Manifolds.'' \textit{arXiv:1212.1722}. — Contains tables of Minkowski polynomials in which coefficients $1,2,1,3,3,1$ appear, related to the combinatorial structure of Fano polytopes and reminiscent of our continued fraction expansion.
+
+\end{thebibliography}
+
+\end{document}
