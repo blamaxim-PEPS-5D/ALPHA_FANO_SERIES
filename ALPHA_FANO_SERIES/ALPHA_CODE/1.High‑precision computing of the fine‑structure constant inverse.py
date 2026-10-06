@@ -1,33 +1,39 @@
 # -*- coding: utf-8 -*-
+"""
+Author: Massimiliano Blandino (ORCID: 0009-0006-3252-4011)
+Reference Manuscript: A representation of the fine-structure constant using pi and a continued fraction of small integers
+DOI: https://doi.org/10.5281/zenodo.19802607
+"""
+
 import mpmath as mp
 
 # ----------------------------------------------------------------------
-# 1. PRECISIONE (200 cifre)
+# 1. PRECISION SETTING (200 digits)
 # ----------------------------------------------------------------------
 mp.dps = 200
 
 # ----------------------------------------------------------------------
-# 2. FORMULA PRINCIPALE (dal paper)
+# 2. MAIN FORMULA (from manuscript)
 # ----------------------------------------------------------------------
 def A():
     pi = mp.pi
     return 4*pi**3 + pi**2 + pi
 
 def alpha_inv_from_K(K):
-    """Calcola alpha^-1 dalla formula: alpha^-1 = A - 1/(24A) - 1/(A^2 pi^2 K)"""
+    """Computes alpha^-1 via the formula: alpha^-1 = A - 1/(24A) - 1/(A^2 pi^2 K)"""
     a = A()
     pi = mp.pi
     return a - 1/(24*a) - 1/(a**2 * pi**2 * K)
 
 def frazione_continua_K(quozienti):
     """
-    Costruisce K = 10 - 1/(q1 + 1/(q2 + 1/(q3 + ...)))
-    Gestisce il caso in cui un quoziente e' 0 (frazione continua finita).
+    Constructs K = 10 - 1/(q1 + 1/(q2 + 1/(q3 + ...)))
+    Handles cases where a partial quotient equals 0 (finite continued fraction).
     """
     if not quozienti:
         return 10
     
-    # Se c'e' uno zero, tronchiamo la frazione continua a quel punto
+    # If a zero is present, truncate the continued fraction at that point
     if 0 in quozienti:
         idx = quozienti.index(0)
         quozienti = quozienti[:idx]
@@ -42,10 +48,10 @@ def frazione_continua_K(quozienti):
     try:
         return 10 - 1 / ricorsiva(quozienti)
     except ZeroDivisionError:
-        return 10  # fallback: se c'e' ancora errore, restituisci K=10
+        return 10  # Fallback: return K=10 in case of division by zero
 
 def continued_fraction(x, n=20, tol=1e-50):
-    """Calcola i quozienti della frazione continua di x."""
+    """Computes the partial quotients of the continued fraction representation of x."""
     coeffs = []
     y = x
     for _ in range(n):
@@ -59,13 +65,14 @@ def continued_fraction(x, n=20, tol=1e-50):
 
 def quozienti_da_target(alpha_target, max_terms=20):
     """
-    Calcola la frazione continua della correzione 1/(10-K) a partire da un valore target di alpha^-1.
-    Restituisce (quozienti, livello_zero)
+    Computes the continued fraction of the correction factor 1/(10-K) 
+    given a target value of alpha^-1.
+    Returns (partial_quotients, zero_error_level)
     """
     a = A()
     pi_val = mp.pi
     try:
-        # Formula inversa: isolo K da alpha^-1 = A - 1/(24A) - 1/(A^2 pi^2 K)
+        # Inverse formula: isolating K from alpha^-1 = A - 1/(24A) - 1/(A^2 pi^2 K)
         denom = a - 1/(24*a) - alpha_target
         if denom == 0:
             return [], None
@@ -76,11 +83,11 @@ def quozienti_da_target(alpha_target, max_terms=20):
     x = 1 / (10 - K_target)
     q = continued_fraction(x, n=max_terms)
     
-    # Trova il livello minimo in cui l'errore si annulla (err < 1e-30)
+    # Identify the minimal truncation level where error vanishes (err < 1e-30)
     livello_zero = None
     for n in range(1, len(q)+1):
         if 0 in q[:n]:
-            continue  # frazione continua finita, non possiamo andare oltre
+            continue  # Finite continued fraction; expansion cannot proceed further
         try:
             K_cf = frazione_continua_K(q[:n])
             alpha_calc = alpha_inv_from_K(K_cf)
@@ -93,7 +100,7 @@ def quozienti_da_target(alpha_target, max_terms=20):
     return q, livello_zero
 
 # ----------------------------------------------------------------------
-# 3. VALORI CODATA STORICI
+# 3. HISTORICAL CODATA VALUES
 # ----------------------------------------------------------------------
 codata_values = {
     2006: mp.mpf('137.035999070'),
@@ -104,15 +111,15 @@ codata_values = {
 }
 
 print("="*110)
-print("ANALISI DEI VALORI CODATA STORICI (2006-2022)")
+print("ANALYSIS OF HISTORICAL CODATA VALUES (2006-2022)")
 print("="*110)
-print(f"{'Anno':<6} {'alpha^-1':<20} {'Primi 10 quozienti':<50} {'Livello zero':<12} {'Quozienti piccoli?'}")
+print(f"{'Year':<6} {'alpha^-1':<20} {'First 10 Partial Quotients':<50} {'Zero Level':<12} {'Bounded Quotients?'}")
 print("-"*110)
 
 for anno, val in codata_values.items():
     q, livello = quozienti_da_target(val, max_terms=20)
     if not q:
-        print(f"{anno:<6} {mp.nstr(val, 12):<20} {'ERRORE':<50} {'---':<12} {'---'}")
+        print(f"{anno:<6} {mp.nstr(val, 12):<20} {'ERROR':<50} {'---':<12} {'---'}")
         continue
     
     q_str = str(q[:10]) if len(q) >= 10 else str(q)
@@ -123,10 +130,10 @@ for anno, val in codata_values.items():
     print(f"{anno:<6} {mp.nstr(val, 12):<20} {q_str:<50} {livello_str:<12} {piccoli}")
 
 # ----------------------------------------------------------------------
-# 4. SCANSIONE FINE DELL'INTERVALLO STORICO (con gestione errori)
+# 4. FINE SCAN OF THE HISTORICAL INTERVAL (with exception handling)
 # ----------------------------------------------------------------------
 print("\n" + "="*110)
-print("SCANSIONE FINE DELL'INTERVALLO STORICO (step 1e-9)")
+print("FINE SCAN OF THE HISTORICAL INTERVAL (step size 1e-9)")
 print("="*110)
 
 start = mp.mpf('137.03599907')
@@ -147,19 +154,19 @@ while alpha <= end:
     alpha += step
 
 if alpha_critici:
-    print(f"Trovati {len(alpha_critici)} valori con quozienti > 100:")
+    print(f"Found {len(alpha_critici)} values with partial quotients > 100:")
     for v in alpha_critici[:15]:
         print(f"  alpha^-1 ~ {v:.12f}")
 else:
-    print("NESSUN valore nell'intervallo storico ha prodotto quozienti > 100")
+    print("NO values within the historical interval generated partial quotients > 100")
 if errori > 0:
-    print(f"(Nota: {errori} valori hanno causato errori e sono stati saltati)")
+    print(f"(Note: {errori} evaluation steps triggered numerical errors and were skipped)")
 
 # ----------------------------------------------------------------------
-# 5. VERIFICA PROPRIETA GENERALE (massimo quoziente tra i CODATA)
+# 5. GENERAL PROPERTY VERIFICATION (maximum quotient across CODATA)
 # ----------------------------------------------------------------------
 print("\n" + "="*110)
-print("VERIFICA PROPRIETA: tutti i valori CODATA storici hanno quozienti limitati?")
+print("PROPERTY VERIFICATION: Are partial quotients bounded for all historical CODATA values?")
 print("="*110)
 
 max_global = 0
@@ -168,21 +175,21 @@ for anno, val in codata_values.items():
     if q:
         max_q = max(abs(x) for x in q[:10])
         max_global = max(max_global, max_q)
-        print(f"{anno}: max quoziente = {max_q}")
+        print(f"{anno}: max quotient = {max_q}")
     else:
-        print(f"{anno}: ERRORE")
+        print(f"{anno}: ERROR")
 
-print(f"\nMassimo quoziente osservato tra tutti i valori CODATA storici: {max_global}")
+print(f"\nMaximum observed quotient across all historical CODATA values: {max_global}")
 if max_global <= 45:
-    print("Tutti i valori hanno quozienti <= 45 (proprieta stabile)")
+    print("All values exhibit bounded quotients <= 45 (stable property)")
 else:
-    print(f"Valore massimo {max_global} > 45, ma comunque piccolo.")
+    print(f"Maximum quotient {max_global} > 45, yet remains bounded.")
 
 # ----------------------------------------------------------------------
-# 6. CALCOLO DIRETTO DELLA FORMULA DEL PAPER
+# 6. DIRECT COMPUTATION OF THE ANALYTICAL FORMULA
 # ----------------------------------------------------------------------
 print("\n" + "="*110)
-print("CALCOLO DELLA FORMULA ESATTA DEL PAPER (con K definito dalla frazione continua)")
+print("ANALYTICAL FORMULA COMPUTATION (with K defined by continued fraction expansion)")
 print("="*110)
 
 quozienti_paper = [14, 1, 7, 3, 1, 3]
@@ -190,11 +197,11 @@ K_paper = frazione_continua_K(quozienti_paper)
 alpha_inv_paper = alpha_inv_from_K(K_paper)
 alpha_paper = 1 / alpha_inv_paper
 
-print("K (dal paper) = 10 - 1/(14 + 1/(1 + 1/(7 + 1/(3 + 1/(1 + 1/3)))))")
+print("K (analytical) = 10 - 1/(14 + 1/(1 + 1/(7 + 1/(3 + 1/(1 + 1/3)))))")
 print(f"K = {mp.nstr(K_paper, 25)}")
-print(f"alpha^-1 (formula) = {mp.nstr(alpha_inv_paper, 25)}")
+print(f"alpha^-1 (analytical) = {mp.nstr(alpha_inv_paper, 25)}")
 print(f"alpha^-1 (CODATA 2022) = {mp.nstr(codata_values[2022], 25)}")
-print(f"Errore alpha^-1    = {float(abs(alpha_inv_paper - codata_values[2022])):.2e}")
-print(f"alpha (formula) = {mp.nstr(alpha_paper, 25)}")
+print(f"Absolute Error alpha^-1 = {float(abs(alpha_inv_paper - codata_values[2022])):.2e}")
+print(f"alpha (analytical) = {mp.nstr(alpha_paper, 25)}")
 print(f"alpha (CODATA 2022) = {mp.nstr(1/codata_values[2022], 25)}")
 print("="*110)
