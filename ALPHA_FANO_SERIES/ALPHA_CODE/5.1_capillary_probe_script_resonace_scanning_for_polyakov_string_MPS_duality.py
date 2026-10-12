@@ -5,7 +5,8 @@ Precision probe of S_alpha = ln(λ_max) - π in the range N_steps in [5000, 6500
 
 Author: Massimiliano Blandino
 ORCID: https://orcid.org/0009-0006-3252-4011
-GITHUB Repository: # Repository Link: [Alpha code](https://github.com/blamaxim-PEPS-5D/ALPHA_FANO_SERIES/blob/main/ALPHA_FANO_SERIES/ALPHA_CODE/5.1_capillary_probe_script_resonace_scanning_for_polyakov_string_MPS_duality.py)
+Repository: ALPHA_FANO_SERIES 
+Code URL: https://github.com/blamaxim-PEPS-5D/ALPHA_FANO_SERIES/blob/main/ALPHA_FANO_SERIES/ALPHA_CODE/5.1_capillary_probe_script_resonace_scanning_for_polyakov_string_MPS_duality.py
 """
 
 import numpy as np
